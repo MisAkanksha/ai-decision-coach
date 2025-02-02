@@ -117,58 +117,48 @@ if st.session_state.get("step5_complete", False):
         st.session_state["step6_complete"] = True
 
 if st.session_state.get("step6_complete", False):
-    # 🔹 Show Report Preview Before Download
-    st.markdown("### 📄 Your Decision Plan")
-    st.write(f"**Decision:** {decision}")
-    st.write(f"**Confidence Level:** {confidence_score}/10")
-    st.write("**Pros:**", pros)
-    st.write("**Cons:**", cons)
-    st.write("**AI Reflections:**", ai_questions)
-    st.write("**Your Thoughts:**", user_reflections)
-    st.write("**Final Decision:**", final_decision)
-
-    # ✅ Fix PDF Text Wrapping
-    def wrap_text(canvas, text, x, y, max_width=80):
-        """Wrap text properly so it does not run off the page"""
-        wrapped_lines = wrap(text, max_width)
-        for line in wrapped_lines:
-            canvas.drawString(x, y, line)
-            y -= 15  # Move down for next line
-        return y
-
-   def wrap_text(canvas, text, x, y, max_width=80):
-        """Wrap text properly so it does not run off the page"""
-        wrapped_lines = wrap(text, max_width)
-        for line in wrapped_lines:
-            canvas.drawString(x, y, line)
-            y -= 15  # Move down for next line
-        return y
-
-    if "step6_complete" in st.session_state and st.session_state["step6_complete"]:
-    if "pdf_generated" not in st.session_state:  # **Ensure PDF is only generated once**
+    # 🔹 Fix Duplicate Download Button Issue
+    if "pdf_generated" not in st.session_state:  
         with st.spinner("Generating your PDF..."):
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             pdf_filename = "decision_report.pdf"
             pdf = canvas.Canvas(pdf_filename, pagesize=letter)
 
             y = 750
-            y = wrap_text(pdf, f"Break the Loop: Decision Report - {timestamp}", 100, y)
-            y = wrap_text(pdf, f"Decision: {decision}", 100, y - 20)
-            y = wrap_text(pdf, f"Confidence Score: {confidence_score}/10", 100, y - 20)
-            y = wrap_text(pdf, f"Pros: {pros}", 100, y - 20)
-            y = wrap_text(pdf, f"Cons: {cons}", 100, y - 20)
-            y = wrap_text(pdf, f"AI Insights: {ai_questions}", 100, y - 20)
-            y = wrap_text(pdf, f"Your Thoughts: {user_reflections}", 100, y - 20)
-            y = wrap_text(pdf, f"Final Decision: {final_decision}", 100, y - 20)
+            pdf.drawString(100, y, f"Break the Loop: Decision Report - {timestamp}")
+            y -= 20
+            pdf.drawString(100, y, f"Decision: {decision}")
+            y -= 20
+            pdf.drawString(100, y, f"Confidence Score: {confidence_score}/10")
+            y -= 20
+            pdf.drawString(100, y, "Pros:")
+            y -= 15
+            pdf.drawString(120, y, pros)
+            y -= 20
+            pdf.drawString(100, y, "Cons:")
+            y -= 15
+            pdf.drawString(120, y, cons)
+            y -= 20
+            pdf.drawString(100, y, "AI Insights:")
+            y -= 15
+            pdf.drawString(120, y, ai_questions)
+            y -= 20
+            pdf.drawString(100, y, "Your Thoughts:")
+            y -= 15
+            pdf.drawString(120, y, user_reflections)
+            y -= 20
+            pdf.drawString(100, y, "Final Decision:")
+            y -= 15
+            pdf.drawString(120, y, final_decision)
 
             pdf.save()
-            st.session_state["pdf_generated"] = True  # **Mark PDF as generated to prevent duplicate buttons**
+            st.session_state["pdf_generated"] = True  
 
     with open(pdf_filename, "rb") as pdf_file:
         pdf_bytes = pdf_file.read()
-        **st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")**  # **Now only appears once**
+        st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")
 
-        # 🔹 Footer Disclaimer at the Bottom
+# 🔹 Footer Disclaimer at the Bottom
 st.markdown(
     "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
     "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
@@ -176,4 +166,3 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True
 )
-
