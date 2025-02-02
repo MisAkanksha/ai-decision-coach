@@ -146,14 +146,19 @@ if st.session_state.get("step6_complete", False):
             y = wrap_text(pdf, f"Break the Loop: Decision Report - {timestamp}", 100, y)
             y = wrap_text(pdf, f"Decision: {decision}", 100, y - 20)
             y = wrap_text(pdf, f"Confidence Score: {confidence_score}/10", 100, y - 20)
-            y = wrap_text(pdf, f"Pros: {pros}", 100, y - 20)
-            y = wrap_text(pdf, f"Cons: {cons}", 100, y - 20)
-            y = wrap_text(pdf, f"AI Insights: {ai_questions}", 100, y - 20)
-            y = wrap_text(pdf, f"Your Thoughts: {user_reflections}", 100, y - 20)
-            y = wrap_text(pdf, f"Final Decision: {final_decision}", 100, y - 20)
 
             pdf.save()
 
             with open(pdf_filename, "rb") as pdf_file:
                 pdf_bytes = pdf_file.read()
                 st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")
+
+# 🔹 Footer Disclaimer at the Bottom
+st.markdown(
+    "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
+    "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
+    "<a href='https://findahelpline.com/' target='_blank'>Find Help Near You</a>"
+    "</div>",
+    unsafe_allow_html=True
+)
+
