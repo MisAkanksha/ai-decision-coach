@@ -79,7 +79,6 @@ if st.session_state.get("step3_complete", False):
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 temperature=0.6,  # Keeps responses engaging but structured
-                max_tokens=400,  # Limits response length to prevent excessive usage
                 messages=[
                     {"role": "system", "content": "You are a world-renowned life coach. Avoid harmful topics, encourage reflection, and guide users towards clarity. Reframe their problem in a natural way and ask two thought-provoking questions."},
                     {"role": "user", "content": ai_prompt}
