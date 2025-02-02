@@ -25,15 +25,6 @@ st.set_page_config(page_title="Break the Loop", page_icon="🔄", layout="wide")
 st.title("🔄 Break the Loop")
 st.markdown("**Overthinking? Stuck in a decision spiral? Let’s break the loop and get clarity—without the mental exhaustion.**")
 
-# 🔹 Footer Disclaimer (Smaller Text at Bottom)
-st.markdown(
-    "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
-    "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
-    "<a href='https://findahelpline.com/' target='_blank'>Find Help Near You</a>"
-    "</div>",
-    unsafe_allow_html=True
-)
-
 # 🔹 Step 1: Define the Decision
 st.markdown("### 🔍 What’s Keeping You Stuck?")
 decision = st.text_input("What decision are you struggling with?", placeholder="Example: Should I quit my job and start a business?")
@@ -78,22 +69,28 @@ if st.session_state.get("step3_complete", False):
         Cons: {cons}
         Context: {context}
 
-        Instead of listing pros and cons, reframe the problem in a warm, human-like way.
-        Think like a thoughtful life coach. 
-        Then, ask 2 reflective questions to help the user think more deeply.
+        You are a world-renowned life coach who has helped people navigate their toughest decisions.
+        Your approach is warm, reflective, and empowering.
+        Instead of listing pros and cons, reframe the problem in a way that helps users see their decisions more clearly.
+        Ask 2 deep, thought-provoking questions that challenge biases and bring fresh perspectives.
+        You NEVER make the decision for the user but instead guide them toward their own clarity.
         """
         try:
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are a warm, reflective life coach. Avoid harmful topics and encourage reflection. Instead of listing pros and cons, reframe the problem in a natural way and ask two thought-provoking questions."},
-                          {"role": "user", "content": ai_prompt}]
+                temperature=0.6,  # Keeps responses engaging but structured
+                max_tokens=400,  # Limits response length to prevent excessive usage
+                messages=[
+                    {"role": "system", "content": "You are a world-renowned life coach. Avoid harmful topics, encourage reflection, and guide users towards clarity. Reframe their problem in a natural way and ask two thought-provoking questions."},
+                    {"role": "user", "content": ai_prompt}
+                ]
             )
             ai_questions = response.choices[0].message.content
 
             st.markdown("### 🗣 Let’s Break It Down Together")
             st.info(ai_questions)
 
-            user_reflections = st.text_area("💬 What’s Clicking for You Right Now?", placeholder="Write your insights here...")
+            user_reflections = st.text_area("🧠 What Stands Out to You After Reflecting on These Questions?", placeholder="Write your insights here...")
 
         except Exception as e:
             st.error(f"❌ OpenAI API Error: {str(e)}")
@@ -145,3 +142,12 @@ if st.session_state.get("step6_complete", False):
 
     # Download Button
     st.download_button("📥 Download as PDF", data=f"Decision: {decision}\nConfidence: {confidence_score}/10\nPros: {pros}\nCons: {cons}", file_name="decision_report.pdf")
+
+# 🔹 Footer Disclaimer at the Bottom
+st.markdown(
+    "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
+    "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
+    "<a href='https://findahelpline.com/' target='_blank'>Find Help Near You</a>"
+    "</div>",
+    unsafe_allow_html=True
+)
