@@ -25,30 +25,13 @@ st.set_page_config(page_title="Break the Loop", page_icon="🔄", layout="wide")
 st.title("🔄 Break the Loop")
 st.markdown("**Overthinking? Stuck in a decision spiral? Let’s break the loop and get clarity—without the mental exhaustion.**")
 
-# ⚠️ Disclaimer to Set User Expectations
-st.warning("⚠️ **This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support.**")
-st.markdown("👉 **If you are struggling with distressing thoughts, please seek professional help:** [Find a Helpline](https://findahelpline.com/)")
-
-# 🔹 Safety Mechanism: Detect Harmful Inputs
-dangerous_keywords = [
-    "kill myself", "end my life", "suicide", "self harm", "no point in living",
-    "hurt myself", "give up on life", "want to die", "hopeless", "depressed"
-]
-
-def is_dangerous_input(user_input):
-    """Check if the user input contains harmful content"""
-    user_input = user_input.lower()
-    return any(keyword in user_input for keyword in dangerous_keywords)
+# ⚠️ Small Warning Text Instead of Large Block
+st.markdown("⚠️ **If you're struggling with distressing thoughts, please seek professional help.** [Find Help Near You](https://findahelpline.com/)", unsafe_allow_html=True)
 
 # 🔹 Step 1: Define the Decision
 st.markdown("### 🔍 What’s Keeping You Stuck?")
 decision = st.text_input("What decision are you struggling with?", placeholder="Example: Should I quit my job and start a business?")
 decision_type = st.selectbox("What kind of decision is this?", ["Career", "Business", "Personal", "Investment", "Other"])
-
-if is_dangerous_input(decision):
-    st.error("⚠️ If you're struggling with distressing thoughts, please seek professional help. You're not alone.")
-    st.markdown("👉 **Call a crisis helpline**: [Find Help Near You](https://findahelpline.com/)")
-    st.stop()  # Stop execution if input is flagged
 
 step1_complete = st.button("Let’s Map This Out →")
 
@@ -96,7 +79,7 @@ if st.session_state.get("step3_complete", False):
         try:
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are a warm, reflective life coach. Never provide guidance on self-harm, suicide, or distressing situations. Instead, direct users to professional help. Otherwise, help reframe their decision in a natural way and ask two thought-provoking questions."},
+                messages=[{"role": "system", "content": "You are a warm, reflective life coach. Avoid harmful topics and encourage reflection. Instead of listing pros and cons, reframe the problem in a natural way and ask two thought-provoking questions."},
                           {"role": "user", "content": ai_prompt}]
             )
             ai_questions = response.choices[0].message.content
@@ -142,3 +125,17 @@ if st.session_state.get("step5_complete", False):
 
     if step6_complete:
         st.session_state["step6_complete"] = True
+
+if st.session_state.get("step6_complete", False):
+    # 🔹 Show Report Preview Before Download
+    st.markdown("### 📄 Your Decision Plan")
+    st.write(f"**Decision:** {decision}")
+    st.write(f"**Confidence Level:** {confidence_score}/10")
+    st.write("**Pros:**", pros)
+    st.write("**Cons:**", cons)
+    st.write("**AI Reflections:**", ai_questions)
+    st.write("**Your Thoughts:**", user_reflections)
+    st.write("**Final Decision:**", final_decision)
+
+    # Download Button
+    st.download_button("📥 Download as PDF", data=f"Decision: {decision}\nConfidence: {confidence_score}/10\nPros: {pros}\nCons: {cons}", file_name="decision_report.pdf")
