@@ -25,8 +25,14 @@ st.set_page_config(page_title="Break the Loop", page_icon="🔄", layout="wide")
 st.title("🔄 Break the Loop")
 st.markdown("**Overthinking? Stuck in a decision spiral? Let’s break the loop and get clarity—without the mental exhaustion.**")
 
-# ⚠️ Small Warning Text Instead of Large Block
-st.markdown("⚠️ **If you're struggling with distressing thoughts, please seek professional help.** [Find Help Near You](https://findahelpline.com/)", unsafe_allow_html=True)
+# 🔹 Footer Disclaimer (Smaller Text at Bottom)
+st.markdown(
+    "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
+    "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
+    "<a href='https://findahelpline.com/' target='_blank'>Find Help Near You</a>"
+    "</div>",
+    unsafe_allow_html=True
+)
 
 # 🔹 Step 1: Define the Decision
 st.markdown("### 🔍 What’s Keeping You Stuck?")
