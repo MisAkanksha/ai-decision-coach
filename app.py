@@ -111,6 +111,18 @@ if st.session_state.get("step4_complete", False):
 if st.session_state.get("step5_complete", False):
     confidence_score = st.slider("📊 How sure are you about this decision? (1-10)", min_value=1, max_value=10, value=7)
 
+    ai_suggestions = "No additional recommendations. You seem confident!"  
+
+    if confidence_score < 5:
+        st.warning("You seem uncertain. Consider stepping away and revisiting later.")
+        ai_suggestions = """
+        🌿 Take a walk to clear your mind.  
+        🧘 Try meditating for a few minutes.  
+        ⏳ Sleep on it and revisit the decision tomorrow.  
+        📖 Write down what’s still unclear and reflect.  
+        """
+        st.info(ai_suggestions)
+
     step6_complete = st.button("Finalize My Plan →")
 
     if step6_complete:
@@ -146,6 +158,11 @@ if st.session_state.get("step6_complete", False):
             y = wrap_text(pdf, f"Break the Loop: Decision Report - {timestamp}", 100, y)
             y = wrap_text(pdf, f"Decision: {decision}", 100, y - 20)
             y = wrap_text(pdf, f"Confidence Score: {confidence_score}/10", 100, y - 20)
+            y = wrap_text(pdf, f"Pros: {pros}", 100, y - 20)
+            y = wrap_text(pdf, f"Cons: {cons}", 100, y - 20)
+            y = wrap_text(pdf, f"AI Insights: {ai_questions}", 100, y - 20)
+            y = wrap_text(pdf, f"Your Thoughts: {user_reflections}", 100, y - 20)
+            y = wrap_text(pdf, f"Final Decision: {final_decision}", 100, y - 20)
 
             pdf.save()
 
