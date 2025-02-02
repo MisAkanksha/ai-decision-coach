@@ -127,8 +127,9 @@ if st.session_state.get("step6_complete", False):
     st.write("**Your Thoughts:**", user_reflections)
     st.write("**Final Decision:**", final_decision)
 
-    # 🔹 Fix PDF Text Wrapping
+    # ✅ Fix PDF Text Wrapping
     def wrap_text(canvas, text, x, y, max_width=80):
+        """Wrap text properly so it does not run off the page"""
         wrapped_lines = wrap(text, max_width)
         for line in wrapped_lines:
             canvas.drawString(x, y, line)
