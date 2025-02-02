@@ -136,7 +136,16 @@ if st.session_state.get("step6_complete", False):
             y -= 15  # Move down for next line
         return y
 
-    if st.button("📥 Download as PDF"):
+   def wrap_text(canvas, text, x, y, max_width=80):
+        """Wrap text properly so it does not run off the page"""
+        wrapped_lines = wrap(text, max_width)
+        for line in wrapped_lines:
+            canvas.drawString(x, y, line)
+            y -= 15  # Move down for next line
+        return y
+
+    if "step6_complete" in st.session_state and st.session_state["step6_complete"]:
+    if "pdf_generated" not in st.session_state:  # **Ensure PDF is only generated once**
         with st.spinner("Generating your PDF..."):
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             pdf_filename = "decision_report.pdf"
@@ -146,14 +155,20 @@ if st.session_state.get("step6_complete", False):
             y = wrap_text(pdf, f"Break the Loop: Decision Report - {timestamp}", 100, y)
             y = wrap_text(pdf, f"Decision: {decision}", 100, y - 20)
             y = wrap_text(pdf, f"Confidence Score: {confidence_score}/10", 100, y - 20)
+            y = wrap_text(pdf, f"Pros: {pros}", 100, y - 20)
+            y = wrap_text(pdf, f"Cons: {cons}", 100, y - 20)
+            y = wrap_text(pdf, f"AI Insights: {ai_questions}", 100, y - 20)
+            y = wrap_text(pdf, f"Your Thoughts: {user_reflections}", 100, y - 20)
+            y = wrap_text(pdf, f"Final Decision: {final_decision}", 100, y - 20)
 
             pdf.save()
+            st.session_state["pdf_generated"] = True  # **Mark PDF as generated to prevent duplicate buttons**
 
-            with open(pdf_filename, "rb") as pdf_file:
-                pdf_bytes = pdf_file.read()
-                st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")
+    with open(pdf_filename, "rb") as pdf_file:
+        pdf_bytes = pdf_file.read()
+        **st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")**  # **Now only appears once**
 
-# 🔹 Footer Disclaimer at the Bottom
+        # 🔹 Footer Disclaimer at the Bottom
 st.markdown(
     "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
     "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
