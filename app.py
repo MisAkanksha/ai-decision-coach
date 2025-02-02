@@ -78,7 +78,7 @@ if st.session_state.get("step3_complete", False):
         try:
             response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
-                temperature=0.6,  # Keeps responses engaging but structured
+                temperature=0.6,
                 messages=[
                     {"role": "system", "content": "You are a world-renowned life coach. Avoid harmful topics, encourage reflection, and guide users towards clarity. Reframe their problem in a natural way and ask two thought-provoking questions."},
                     {"role": "user", "content": ai_prompt}
@@ -111,18 +111,6 @@ if st.session_state.get("step4_complete", False):
 if st.session_state.get("step5_complete", False):
     confidence_score = st.slider("📊 How sure are you about this decision? (1-10)", min_value=1, max_value=10, value=7)
 
-    ai_suggestions = "No additional recommendations. You seem confident!"  
-
-    if confidence_score < 5:
-        st.warning("You seem uncertain. Consider stepping away and revisiting later.")
-        ai_suggestions = """
-        🌿 Take a walk to clear your mind.  
-        🧘 Try meditating for a few minutes.  
-        ⏳ Sleep on it and revisit the decision tomorrow.  
-        📖 Write down what’s still unclear and reflect.  
-        """
-        st.info(ai_suggestions)
-
     step6_complete = st.button("Finalize My Plan →")
 
     if step6_complete:
@@ -139,14 +127,32 @@ if st.session_state.get("step6_complete", False):
     st.write("**Your Thoughts:**", user_reflections)
     st.write("**Final Decision:**", final_decision)
 
-    # Download Button
-    st.download_button("📥 Download as PDF", data=f"Decision: {decision}\nConfidence: {confidence_score}/10\nPros: {pros}\nCons: {cons}", file_name="decision_report.pdf")
+    # 🔹 Fix PDF Text Wrapping
+    def wrap_text(canvas, text, x, y, max_width=80):
+        wrapped_lines = wrap(text, max_width)
+        for line in wrapped_lines:
+            canvas.drawString(x, y, line)
+            y -= 15  # Move down for next line
+        return y
 
-# 🔹 Footer Disclaimer at the Bottom
-st.markdown(
-    "<div style='text-align: center; font-size: 12px; margin-top: 50px;'>"
-    "⚠️ This tool is designed for structured decision-making. It is NOT a substitute for professional mental health support. "
-    "<a href='https://findahelpline.com/' target='_blank'>Find Help Near You</a>"
-    "</div>",
-    unsafe_allow_html=True
-)
+    if st.button("📥 Download as PDF"):
+        with st.spinner("Generating your PDF..."):
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            pdf_filename = "decision_report.pdf"
+            pdf = canvas.Canvas(pdf_filename, pagesize=letter)
+
+            y = 750
+            y = wrap_text(pdf, f"Break the Loop: Decision Report - {timestamp}", 100, y)
+            y = wrap_text(pdf, f"Decision: {decision}", 100, y - 20)
+            y = wrap_text(pdf, f"Confidence Score: {confidence_score}/10", 100, y - 20)
+            y = wrap_text(pdf, f"Pros: {pros}", 100, y - 20)
+            y = wrap_text(pdf, f"Cons: {cons}", 100, y - 20)
+            y = wrap_text(pdf, f"AI Insights: {ai_questions}", 100, y - 20)
+            y = wrap_text(pdf, f"Your Thoughts: {user_reflections}", 100, y - 20)
+            y = wrap_text(pdf, f"Final Decision: {final_decision}", 100, y - 20)
+
+            pdf.save()
+
+            with open(pdf_filename, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+                st.download_button("📥 Download as PDF", data=pdf_bytes, file_name="decision_report.pdf", mime="application/pdf")
